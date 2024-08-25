@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPL Data Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>IPL Data Visualization</h1>
+    <div id="charts"></div>
+
+    <script>
+        async function loadData() {
+            const response = await fetch('/processedIPLData.json');
+            const data = await response.json();
+
+            const chartsContainer = document.getElementById('charts');
+
+            for (let season in data) {
+                // Create a section for each season
+                const section = document.createElement('section');
+                section.innerHTML = `<h2>${season} Season</h2>`;
+
+                // Top 10 Players (Orange Cap)
+                section.innerHTML += `<h3>Top 10 Players (Orange Cap)</h3>
+                <canvas id="topPlayers${season}"></canvas>`;
+
+                chartsContainer.appendChild(section);
+
+                const ctxTopPlayers = document.getElementById(`topPlayers${season}`).getContext('2d');
+                new Chart(ctxTopPlayers, {
+                    type: 'bar',
+                    data: {
+                        labels: data[season].topPlayers.map(p => p.name),
+                        datasets: [{
+                            label: 'Runs',
+                            data: data[season].topPlayers.map(p => p.runs),
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }]
+                    }
+                });
+
+                // Repeat for other charts (mostFours, mostSixes, mostCenturies, mostFifties)
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
